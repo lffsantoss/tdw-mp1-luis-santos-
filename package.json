@@ -1,10 +1,11 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next",
+    "dev": "next dev",
     "build": "next build && next export",
     "start": "next start",
-    "setup": "node ./contentful/setup.js",
+    "lint": "next lint",
+    "test": "jest",
     "format": "prettier --check pages",
     "format:write": "prettier --write pages"
   },
