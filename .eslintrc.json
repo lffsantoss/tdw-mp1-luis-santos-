@@ -3,10 +3,15 @@
         "browser": true,
         "es2021": true
     },
-    "extends": [
+    "extends":  [ 
         "eslint:recommended",
         "plugin:react/recommended"
     ],
+    "globals":{
+        "process": "readonly"
+
+     } ,
+    
     "overrides": [
     ],
     "parserOptions": {
@@ -17,5 +22,8 @@
         "react"
     ],
     "rules": {
+        "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": 0
     }
 }
