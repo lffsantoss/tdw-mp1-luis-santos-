@@ -9,8 +9,7 @@
     ],
     "globals":{
         "process": "readonly"
-
-     } ,
+ } ,
     
     "overrides": [
     ],
