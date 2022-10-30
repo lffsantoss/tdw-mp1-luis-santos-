@@ -26,11 +26,6 @@ lint:
 format:
   stage: validate
   script:
-    - npx cross-env CONTENTFUL_SPACE_ID=g8l6c2uvmzxo CONTENTFUL_MANAGEMENT_TOKEN=CFPAT-NVDwukbwpJaXBlr2YRT6eAt2fctoqtzV4D_eZa6GgzQ npm  run setup
-
-contentful-run:
-  stage: validate
-  script:
     - npm run format:write
 
 build:
