@@ -41,4 +41,5 @@ deploy:
   stage: deploy
   script:
     - npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod
+    - npx cross-env CONTENTFUL_SPACE_ID=g8l6c2uvmzxo CONTENTFUL_MANAGEMENT_TOKEN=CFPAT-NVDwukbwpJaXBlr2YRT6eAt2fctoqtzV4D_eZa6GgzQ npm run setup
   only: [main]
