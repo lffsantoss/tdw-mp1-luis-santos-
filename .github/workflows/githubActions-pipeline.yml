@@ -15,7 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: npm install -g npm@latest
-      - run: npm install next
       - name: Upload results
         uses: actions/checkout@v3
         with:
