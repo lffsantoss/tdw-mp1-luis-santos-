@@ -5,7 +5,7 @@
     "build": "next build && next export",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "format": "prettier --check pages",
     "format:write": "prettier --write pages",
     "setup": "node contentful/setup.js"
