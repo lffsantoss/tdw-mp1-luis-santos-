@@ -12,7 +12,6 @@ on:
 jobs:
   install:
     runs-on: windows-latest
-    container: node:latest
     steps:
       - uses: actions/checkout@v3
       - run: npm install
@@ -25,7 +24,6 @@ jobs:
       
   validate:
     runs-on: windows-latest
-    container: node:latest
     steps:
       - uses: actions/checkout@v3
       - run: npm run test
@@ -34,7 +32,6 @@ jobs:
       
   build:
     runs-on: windows-latest
-    container: node:latest
     needs: [install,validate]
     steps:
       - uses: actions/checkout@v3
@@ -48,7 +45,6 @@ jobs:
       
   deploy:
     runs-on: windows-latest
-    container: node:latest
     needs: [install,validate,build]
     steps:
       - uses: actions/checkout@v3
