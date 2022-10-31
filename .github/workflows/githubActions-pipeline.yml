@@ -1,84 +1,54 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: mctw-tdw-mp1-luis-santos
+name : mctw-tdw-mp1-luis-santos
 
 on:
-  push:
-    branches: [ "main" ]
+  push: 
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
-  schedule: 
+    branches: [main]
+  schedule:
     - cron: '0 0 * * *'
-
+    
+    
 jobs:
   install:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: instalacao
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm install
+      - uses: actions/checkout@v3
+      - run: npm install -g npm@latest
+      - name: Upload results
+        uses: actions/checkout@v3
+        with:
+          name: pipeline_results_install
+          path: node_modules/
     
+      
   validate:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-
+    runs-on: windows-latest
+    needs: [install]
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm run test
-    - run: npm run lint
-    - run: npm run format:write
-    
+      - uses: actions/checkout@v3
+      - run: npm run test
+      - run: npm run lint
+      - run: npm run format:write
+      
   build:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-
+    runs-on: windows-latest
+    needs: [install,validate]
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm run build
-
+      - uses: actions/checkout@v3
+      - run: npm run build
+      - name: Upload results
+        uses: actions/checkout@v3
+        with:
+          name: pipeline_results_build
+          path: node_modules/
+          on: main
+      
   deploy:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-
+    runs-on: windows-latest
+    needs: [install,validate,build]
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod
+      - uses: actions/checkout@v3
+      - run: npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod
+     
   
