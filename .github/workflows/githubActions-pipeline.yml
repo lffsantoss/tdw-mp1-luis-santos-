@@ -8,12 +8,17 @@ on:
   schedule:
     - cron: '0 0 * * *'
     
+env:
+  NETLIFY_SITE_ID: ${{secrets.NETLIFY_SITE_ID}}
+  NETLIFY_AUTH_TOKEN: ${{secrets.NETLIFY_AUTH_TOKEN}}
+    
     
 jobs:
   install:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
       - run: npm install -g npm@latest
       - name: Upload results
         uses: actions/checkout@v3
@@ -27,6 +32,7 @@ jobs:
     needs: [install]
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
       - run: npm run test
       - run: npm run lint
       - run: npm run format:write
@@ -36,6 +42,7 @@ jobs:
     needs: [install,validate]
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
       - run: npm run build
       - name: Upload results
         uses: actions/checkout@v3
@@ -49,6 +56,7 @@ jobs:
     needs: [install,validate,build]
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
       - run: npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod
      
   
