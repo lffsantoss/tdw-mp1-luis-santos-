@@ -1,4 +1,4 @@
-name: mctw-tdw-mp1-luis-santos
+name: mctw-tdw-mp1-luis
 'on':
   push:
     branches:
