@@ -8,9 +8,6 @@ on:
   schedule:
     - cron: '0 0 * * *'
     
-env:
-  NETLIFY_SITE_ID: ${{secrets.NETLIFY_SITE_ID}}
-  NETLIFY_AUTH_TOKEN: ${{secrets.NETLIFY_AUTH_TOKEN}}
     
     
 jobs:
@@ -95,6 +92,10 @@ jobs:
         with:
           path: out
           retention-days: 1
+        env:
+            NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+            NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          
       - run: npx netlify-cli deploy --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN" --prod
      
   
