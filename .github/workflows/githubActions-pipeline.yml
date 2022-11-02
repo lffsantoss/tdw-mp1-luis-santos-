@@ -2,9 +2,9 @@ name : mctw-tdw-mp1-luis-santos
 
 on:
   push: 
-    branches: [test-pipeline-fix]
+    branches: [main]
   pull_request:
-    branches: [test-pipeline-fix]
+    branches: [main]
 
 jobs:
   install:
