@@ -1,11 +1,11 @@
 name: mctw-tdw-mp1-luis-santos
-
-on:
+'on':
   push:
-    branches: [test-pipeline-fix]
+    branches:
+      - test-pipeline-fix
   pull_request:
-    branches: [test-pipeline-fix]
-
+    branches:
+      - test-pipeline-fix
 jobs:
   install:
     runs-on: ubuntu-latest
@@ -17,11 +17,13 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: >-
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{
+            hashFiles('**/package-lock.json') }}
       - run: npm ci
-
   build:
-    needs: [install]
+    needs:
+      - install
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,18 +33,21 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: >-
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{
+            hashFiles('**/package-lock.json') }}
       - env:
-          CONTENTFUL_ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-          CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
-      - run: npm run build
+          CONTENTFUL_ACCESS_TOKEN: '${{ secrets.CONTENTFUL_ACCESS_TOKEN }}'
+          CONTENTFUL_SPACE_ID: '${{ secrets.CONTENTFUL_SPACE_ID }}'
+        run: npm run build
       - uses: actions/cache@v2
         with:
           path: out
-          key: ${{ github.run_id }}
-
+          key: '${{ github.run_id }}'
   deploy:
-    needs: [install, build]
+    needs:
+      - install
+      - build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -52,12 +57,16 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: >-
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{
+            hashFiles('**/package-lock.json') }}
       - uses: actions/cache@v2
         with:
           path: out
-          key: ${{ github.run_id }}
+          key: '${{ github.run_id }}'
       - env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-      - run: npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod
+          NETLIFY_AUTH_TOKEN: '${{ secrets.NETLIFY_AUTH_TOKEN }}'
+          NETLIFY_SITE_ID: '${{ secrets.NETLIFY_SITE_ID }}'
+          run: >-
+            npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth
+            $NETLIFY_AUTH_TOKEN --prod
