@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: npm install -g npm@latest
+      - run: npm install
       - name: Upload results
         with:
           name: pipeline_results_install
@@ -32,10 +32,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
       - name: Cache node modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
+        with:
+          path: node_modules
       - run: npm run test
       - run: npm run lint
       - run: npm run format:write
@@ -44,29 +48,33 @@ jobs:
     runs-on: windows-latest
     needs: [install,validate]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
+     - uses: actions/checkout@v3
+     - uses: actions/setup-node@v3
+       with:
+          node-version: "16"
+     - name: Cache node modules
+       uses: actions/cache@v2
+       env:
           cache-name: cache-node-modules
-      - run: npm run build
-      - name: Upload results
-        with:
-          name: pipeline_results_build
-          path: node_modules/
-          on: main
-      
+       with:
+          path: node_modules
+     - run: npm run build
+     - uses : actions/upload-artifacts@v3
+       with:
+          path: out
+          
   deploy:
+    needs: [install, validate, build]
     runs-on: windows-latest
-    needs: [install,validate,build]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-      - run: npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod
+        with:
+          node-version: "16"
+      - uses: actions/download-artifact@v3
+        with:
+          path: out
+          retention-days: 1
+      - run: npx netlify-cli deploy --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN" --prod
      
   
