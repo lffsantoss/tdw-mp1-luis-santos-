@@ -1,6 +1,8 @@
 name : mctw-tdw-mp1-luis-santos
 
 on:
+  schedule:
+    - cron: "0 0 * * *"
   push: 
     branches: [main]
   pull_request:
