@@ -1,23 +1,16 @@
-name : mctw-tdw-mp1-luis-santos
+name: mctw-tdw-mp1-luis-santos
 
 on:
-  push: 
-    branches: [main]
+  push:
+    branches: [test-pipeline-fix]
   pull_request:
-    branches: [main]
-  schedule:
-    - cron: '0 0 * * *'
-    
-    
-    
+    branches: [test-pipeline-fix]
+
 jobs:
   install:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18.12.0
+      - uses: actions/checkout@v2
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -25,44 +18,13 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-              ${{ runner.os }}-build-${{ env.cache-name }}-
-              ${{ runner.os }}-build-
-              ${{ runner.os }}-
-      - run: npm install 
-    
-      
-  validate:
-   needs: install
-   runs-on: windows-latest
-   steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18.12.0
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-              ${{ runner.os }}-build-${{ env.cache-name }}-
-              ${{ runner.os }}-build-
-              ${{ runner.os }}-
-      - run: npm run lint
-      - run: npm run format:write
-      - run: npm run test
-      
+      - run: npm ci
+
   build:
-    needs: [install, validate]
-    runs-on: windows-latest
+    needs: [install]
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18.12.0
+      - uses: actions/checkout@v2
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -70,34 +32,32 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - run: npm run build
-      - uses: actions/upload-artifact@v3
+      - env:
+          CONTENTFUL_ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+          CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+        run: npm run build
+      - uses: actions/cache@v2
         with:
           path: out
-          retention-days: 1
-          
+          key: ${{ github.run_id }}
+
   deploy:
-    needs: [install, validate, build]
-    runs-on: windows-latest
-    env:
-      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-      CONTENTFUL_ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
-      CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+    needs: [install, build]
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
         with:
-          node-version: 18.12.0
-      - uses: actions/download-artifact@v3
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - uses: actions/cache@v2
         with:
           path: out
-          retention-days: 1
-          
-      - run: npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod
-     
-  
+          key: ${{ github.run_id }}
+      - env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          run: npx netlify-cli deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_AUTH_TOKEN --prod
