@@ -4,7 +4,7 @@
     "dev": "next dev",
     "build": "next build && next export",
     "start": "next start",
-    "lint": "next lint --dir",
+    "lint": "next lint",
     "test": "jest",
     "format": "prettier --check pages",
     "format:write": "prettier --write pages",
